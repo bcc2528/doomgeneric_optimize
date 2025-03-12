@@ -173,7 +173,7 @@ void V_DrawPatch(int x, int y, patch_t *patch)
 
     w = SHORT(patch->width);
 
-    for ( ; col<w ; x++, col++, desttop++)
+    for ( ; col<w ; col++, desttop++)
     {
         column = (column_t *)((byte *)patch + LONG(patch->columnofs[col]));
 
@@ -237,7 +237,7 @@ void V_DrawPatchFlipped(int x, int y, patch_t *patch)
 
     w = SHORT(patch->width);
 
-    for ( ; col<w ; x++, col++, desttop++)
+    for ( ; col<w ; col++, desttop++)
     {
         column = (column_t *)((byte *)patch + LONG(patch->columnofs[w-1-col]));
 

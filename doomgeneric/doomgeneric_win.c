@@ -55,6 +55,9 @@ static unsigned char convertToDoomKey(unsigned char key)
 	case VK_SHIFT:
 		key = KEY_RSHIFT;
 		break;
+	case VK_MENU:
+		key = KEY_RALT;
+		break;
 	default:
 		key = tolower(key);
 		break;
@@ -86,9 +89,11 @@ static LRESULT CALLBACK wndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 		ExitProcess(0);
 		break;
 	case WM_KEYDOWN:
+	case WM_SYSKEYDOWN:
 		addKeyToQueue(1, wParam);
 		break;
 	case WM_KEYUP:
+	case WM_SYSKEYUP:
 		addKeyToQueue(0, wParam);
 		break;
 	case WM_SIZE:

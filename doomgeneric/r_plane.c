@@ -318,42 +318,6 @@ R_CheckPlane
 
 
 //
-// R_MakeSpans
-//
-void
-R_MakeSpans
-( int		x,
-  int		t1,
-  int		b1,
-  int		t2,
-  int		b2 )
-{
-    while (t1 < t2 && t1<=b1)
-    {
-	R_MapPlane (t1,spanstart[t1],x-1);
-	t1++;
-    }
-    while (b1 > b2 && b1>=t1)
-    {
-	R_MapPlane (b1,spanstart[b1],x-1);
-	b1--;
-    }
-	
-    while (t2 < t1 && t2<=b2)
-    {
-	spanstart[t2] = x;
-	t2++;
-    }
-    while (b2 > b1 && b2>=t2)
-    {
-	spanstart[b2] = x;
-	b2--;
-    }
-}
-
-
-
-//
 // R_DrawPlanes
 // At the end of each frame.
 //
@@ -435,10 +399,32 @@ void R_DrawPlanes (void)
 
 	for (x=pl->minx ; x<= stop ; x++)
 	{
-	    R_MakeSpans(x,pl->top[x-1],
-			pl->bottom[x-1],
-			pl->top[x],
-			pl->bottom[x]);
+		int t1 = pl->top[x - 1];
+        	int b1 = pl->bottom[x - 1];
+        	int t2 = pl->top[x];
+        	int b2 = pl->bottom[x];
+
+		while (t1 < t2 && t1<=b1)
+		{
+			R_MapPlane (t1,spanstart[t1],x-1);
+			t1++;
+		}
+		while (b1 > b2 && b1>=t1)
+		{
+			R_MapPlane (b1,spanstart[b1],x-1);
+			b1--;
+	    	}
+	
+	    	while (t2 < t1 && t2<=b2)
+	    	{
+			spanstart[t2] = x;
+			t2++;
+	    	}
+	    	while (b2 > b1 && b2>=t2)
+	    	{
+			spanstart[b2] = x;
+			b2--;
+	    	}
 	}
 	
         W_ReleaseLumpNum(lumpnum);

@@ -154,7 +154,7 @@ void DG_Init()
 
 void DG_DrawFrame()
 {
-	StretchDIBits(s_Hdc, 0, 0, DOOMGENERIC_RESX, DOOMGENERIC_RESY, 0, 0, DOOMGENERIC_RESX, DOOMGENERIC_RESY, DG_ScreenBuffer, &s_Bmi, 0, SRCCOPY);
+	StretchDIBits(s_Hdc, 0, 0, windowWidth, windowHeight, 0, 0, DOOMGENERIC_RESX, DOOMGENERIC_RESY, DG_ScreenBuffer, &s_Bmi, 0, SRCCOPY);
 }
 
 void DG_SleepMs(uint32_t ms)

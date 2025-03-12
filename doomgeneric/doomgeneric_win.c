@@ -6,6 +6,9 @@
 
 #include <Windows.h>
 
+// for High precision sleep
+#pragma comment( lib, "winmm.lib" )
+
 static BITMAPINFO s_Bmi = { sizeof(BITMAPINFOHEADER), DOOMGENERIC_RESX, -DOOMGENERIC_RESY, 1, 32 };
 static HWND s_Hwnd = 0;
 static HDC s_Hdc = 0;
@@ -16,6 +19,10 @@ static HDC s_Hdc = 0;
 static unsigned short s_KeyQueue[KEYQUEUE_SIZE];
 static unsigned int s_KeyQueueWriteIndex = 0;
 static unsigned int s_KeyQueueReadIndex = 0;
+
+// Aspect ratio 4:3 (640*480)
+static unsigned int windowWidth = DOOMGENERIC_RESX;
+static unsigned int windowHeight = DOOMGENERIC_RESY + 80;
 
 static unsigned char convertToDoomKey(unsigned char key)
 {
@@ -84,6 +91,10 @@ static LRESULT CALLBACK wndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 	case WM_KEYUP:
 		addKeyToQueue(0, wParam);
 		break;
+	case WM_SIZE:
+		windowWidth = LOWORD(lParam);
+		windowHeight = HIWORD(lParam);
+		break;
 	default:
 		return DefWindowProcA(hwnd, msg, wParam, lParam);
 	}
@@ -119,8 +130,8 @@ void DG_Init()
 
 	RECT rect;
 	rect.left = rect.top = 0;
-	rect.right = DOOMGENERIC_RESX;
-	rect.bottom = DOOMGENERIC_RESY;
+	rect.right = windowWidth;
+	rect.bottom = windowHeight;
 	AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE);
 
 	HWND hwnd = CreateWindowExA(0, windowClassName, windowTitle, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, rect.right - rect.left, rect.bottom - rect.top, 0, 0, 0, 0);
@@ -143,18 +154,7 @@ void DG_Init()
 
 void DG_DrawFrame()
 {
-	MSG msg;
-	memset(&msg, 0, sizeof(msg));
-
-	while (PeekMessageA(&msg, 0, 0, 0, PM_REMOVE) > 0)
-	{
-		TranslateMessage(&msg);
-		DispatchMessageA(&msg);
-	}
-
 	StretchDIBits(s_Hdc, 0, 0, DOOMGENERIC_RESX, DOOMGENERIC_RESY, 0, 0, DOOMGENERIC_RESX, DOOMGENERIC_RESY, DG_ScreenBuffer, &s_Bmi, 0, SRCCOPY);
-
-	SwapBuffers(s_Hdc);
 }
 
 void DG_SleepMs(uint32_t ms)
@@ -198,13 +198,34 @@ void DG_SetWindowTitle(const char * title)
 
 int main(int argc, char **argv)
 {
-    doomgeneric_Create(argc, argv);
+	timeBeginPeriod(1);
 
-    for (int i = 0; ; i++)
-    {
-        doomgeneric_Tick();
-    }
-    
+	doomgeneric_Create(argc, argv);
+
+	MSG msg;
+	memset(&msg, 0, sizeof(msg));
+	
+	while (1)
+	{
+		if (PeekMessageA(&msg, NULL, 0, 0, PM_NOREMOVE))
+		{
+            		if(GetMessage(&msg, NULL, 0, 0))
+            		{
+                		TranslateMessage(&msg);
+                		DispatchMessageA(&msg);
+            		}
+			else
+			{
+				break;
+			}
+		}
+		else
+		{
+			doomgeneric_Tick();
+		}
+	}
+
+	timeEndPeriod(1);
 
     return 0;
 }

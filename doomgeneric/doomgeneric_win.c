@@ -28,35 +28,125 @@ static unsigned char convertToDoomKey(unsigned char key)
 {
 	switch (key)
 	{
+	case VK_BACK:
+		key = KEY_BACKSPACE;
+		break;
 	case VK_RETURN:
 		key = KEY_ENTER;
-		break;
-	case VK_ESCAPE:
-		key = KEY_ESCAPE;
-		break;
-	case VK_LEFT:
-		key = KEY_LEFTARROW;
-		break;
-	case VK_RIGHT:
-		key = KEY_RIGHTARROW;
-		break;
-	case VK_UP:
-		key = KEY_UPARROW;
-		break;
-	case VK_DOWN:
-		key = KEY_DOWNARROW;
-		break;
-	case VK_CONTROL:
-		key = KEY_FIRE;
-		break;
-	case VK_SPACE:
-		key = KEY_USE;
 		break;
 	case VK_SHIFT:
 		key = KEY_RSHIFT;
 		break;
+	case VK_CONTROL:
+		key = KEY_FIRE;
+		break;
 	case VK_MENU:
 		key = KEY_RALT;
+		break;
+	case VK_PAUSE:
+		key = KEY_PAUSE;
+		break;
+	case VK_ESCAPE:
+		key = KEY_ESCAPE;
+		break;
+	case VK_SPACE:
+		key = KEY_USE;
+		break;
+	case VK_LEFT:
+		key = KEY_LEFTARROW;
+		break;
+	case VK_UP:
+		key = KEY_UPARROW;
+		break;
+	case VK_RIGHT:
+		key = KEY_RIGHTARROW;
+		break;
+	case VK_DOWN:
+		key = KEY_DOWNARROW;
+		break;
+	case VK_DELETE:
+		key = KEY_DEL;
+		break;
+	case VK_NUMPAD0:
+		key = KEYP_0;
+		break;
+	case VK_NUMPAD1:
+		key = KEYP_1;
+		break;
+	case VK_NUMPAD2:
+		key = KEYP_2;
+		break;
+	case VK_NUMPAD3:
+		key = KEYP_3;
+		break;
+	case VK_NUMPAD4:
+		key = KEYP_4;
+		break;
+	case VK_NUMPAD5:
+		key = KEYP_5;
+		break;
+	case VK_NUMPAD6:
+		key = KEYP_6;
+		break;
+	case VK_NUMPAD7:
+		key = KEYP_7;
+		break;
+	case VK_NUMPAD8:
+		key = KEYP_8;
+		break;
+	case VK_NUMPAD9:
+		key = KEYP_9;
+		break;
+	case VK_MULTIPLY:
+		key = KEYP_MULTIPLY;
+		break;
+	case VK_ADD:
+		key = KEYP_PLUS;
+		break;
+	case VK_SUBTRACT:
+		key = KEYP_MINUS;
+		break;
+	case VK_DECIMAL:
+		key = KEYP_PERIOD;
+		break;
+	case VK_DIVIDE:
+		key = KEYP_DIVIDE;
+		break;
+	case VK_F1:
+		key = KEY_F1;
+		break;
+	case VK_F2:
+		key = KEY_F2;
+		break;
+	case VK_F3:
+		key = KEY_F3;
+		break;
+	case VK_F4:
+		key = KEY_F4;
+		break;
+	case VK_F5:
+		key = KEY_F5;
+		break;
+	case VK_F6:
+		key = KEY_F6;
+		break;
+	case VK_F7:
+		key = KEY_F7;
+		break;
+	case VK_F8:
+		key = KEY_F8;
+		break;
+	case VK_F9:
+		key = KEY_F9;
+		break;
+	case VK_F10:
+		key = KEY_F10;
+		break;
+	case VK_F11:
+		key = KEY_F11;
+		break;
+	case VK_F12:
+		key = KEY_F12;
 		break;
 	default:
 		key = tolower(key);

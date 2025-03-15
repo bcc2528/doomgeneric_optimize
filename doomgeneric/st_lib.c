@@ -91,7 +91,7 @@ STlib_drawNum
     
     int		w = SHORT(n->p[0]->width);
     int		h = SHORT(n->p[0]->height);
-    int		x = n->x;
+    int		x;
     
     int		neg;
 

@@ -954,20 +954,38 @@ void ST_doPaletteStuff(void)
 	
     if (cnt)
     {
-	palette = (cnt+7)>>3;
-	
-	if (palette >= NUMREDPALS)
-	    palette = NUMREDPALS-1;
+        if (cnt >= 4)
+        {
+            palette = (cnt+7)>>3;
+
+            if (palette >= NUMREDPALS)
+            {
+                palette = NUMREDPALS-1;
+            }
+        }
+        else
+        {
+            palette = 0;
+        }
 
 	palette += STARTREDPALS;
     }
 
     else if (plyr->bonuscount)
     {
-	palette = (plyr->bonuscount+7)>>3;
+        if (plyr->bonuscount >= 4)
+        {
+            palette = (plyr->bonuscount+7)>>3;
 
-	if (palette >= NUMBONUSPALS)
-	    palette = NUMBONUSPALS-1;
+            if (palette >= NUMBONUSPALS)
+            {
+                palette = NUMBONUSPALS-1;
+            }
+        }
+        else
+        {
+                palette = 0;
+        }
 
 	palette += STARTBONUSPALS;
     }

@@ -236,7 +236,7 @@ void DG_Init()
 
 		s_Hdc = GetDC(hwnd);
 		ShowWindow(hwnd, SW_SHOW);
-		SetStretchBltMode(s_Hdc, HALFTONE);
+		SetStretchBltMode(s_Hdc, COLORONCOLOR);
 	}
 	else
 	{

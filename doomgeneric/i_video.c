@@ -157,6 +157,7 @@ void cmap_to_fb(uint8_t * out, uint8_t * in, int in_pixels)
     int i, j, k;
     struct color c;
     uint32_t pix;
+    uint32_t bit_per_pixel = s_Fb.bits_per_pixel / 8;
     uint16_t r, g, b;
 
     for (i = 0; i < in_pixels; i++)
@@ -170,10 +171,15 @@ void cmap_to_fb(uint8_t * out, uint8_t * in, int in_pixels)
         pix |= b << s_Fb.blue.offset;
 
         for (k = 0; k < fb_scaling; k++) {
-            for (j = 0; j < s_Fb.bits_per_pixel/8; j++) {
+#ifdef SYS_BIG_ENDIAN
+            for (j = 0; j < bit_per_pixel; j++) {
                 *out = (pix >> (j*8));
                 out++;
             }
+#else
+            memcpy(out, &pix, bit_per_pixel);
+            out += bit_per_pixel;
+#endif
         }
         in++;
     }
@@ -350,11 +356,12 @@ void I_SetPalette (byte* palette)
     /* performance boost:
      * map to the right pixel format over here! */
 
+    byte *gamma = gammatable[usegamma];
     for (i=0; i<256; ++i ) {
         colors[i].a = 0;
-        colors[i].r = gammatable[usegamma][*palette++];
-        colors[i].g = gammatable[usegamma][*palette++];
-        colors[i].b = gammatable[usegamma][*palette++];
+        colors[i].r = gamma[*palette++];
+        colors[i].g = gamma[*palette++];
+        colors[i].b = gamma[*palette++];
     }
 
 #ifdef CMAP256

@@ -338,7 +338,7 @@ void I_FinishUpdate (void)
         line_in += SCREENWIDTH;
     }
 
-　　DG_DrawFrame();
+    DG_DrawFrame();
 }
 
 //

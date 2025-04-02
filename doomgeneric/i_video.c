@@ -227,7 +227,16 @@ void I_InitGraphics (void)
     i = M_CheckParmWithArgs("-scaling", 1);
     if (i > 0) {
         i = atoi(myargv[i + 1]);
-        fb_scaling = i;
+        if (i > (s_Fb.xres / SCREENWIDTH) || i > (s_Fb.yres / SCREENHEIGHT))
+        {
+            fb_scaling = s_Fb.xres / SCREENWIDTH;
+            if (s_Fb.yres / SCREENHEIGHT < fb_scaling)
+                fb_scaling = s_Fb.yres / SCREENHEIGHT;
+        }
+        else
+        {
+            fb_scaling = i;
+        }
         printf("I_InitGraphics: Scaling factor: %d\n", fb_scaling);
     } else {
         fb_scaling = s_Fb.xres / SCREENWIDTH;
@@ -272,8 +281,10 @@ void I_UpdateNoBlit (void)
 void I_FinishUpdate (void)
 {
     int y;
-    int x_offset, y_offset, x_offset_end;
-    unsigned char *line_in, *line_out;
+    int x_offset, y_offset, x_offset_end, width_bytes;
+    unsigned char *line_in, *line_out, *line_out_copy;
+
+    width_bytes = SCREENWIDTH * fb_scaling * (s_Fb.bits_per_pixel / 8);
 
     /* Offsets in case FB is bigger than DOOM */
     /* 600 = s_Fb heigt, 200 screenheight */
@@ -293,9 +304,9 @@ void I_FinishUpdate (void)
     while (y--)
     {
         int i;
+#ifdef CMAP256
         for (i = 0; i < fb_scaling; i++) {
             line_out += x_offset;
-#ifdef CMAP256
             if (fb_scaling == 1) {
                 memcpy(line_out, line_in, SCREENWIDTH); /* fb_width is bigger than Doom SCREENWIDTH... */
             } else {
@@ -308,16 +319,26 @@ void I_FinishUpdate (void)
                     }
                 }
             }
-#else
-            //cmap_to_rgb565((void*)line_out, (void*)line_in, SCREENWIDTH);
-            cmap_to_fb((void*)line_out, (void*)line_in, SCREENWIDTH);
-#endif
-            line_out += (SCREENWIDTH * fb_scaling * (s_Fb.bits_per_pixel/8)) + x_offset_end;
+　          line_out += width_bytes + x_offset_end;
         }
+#else
+        line_out += x_offset;
+        //cmap_to_rgb565((void*)line_out, (void*)line_in, SCREENWIDTH);
+        cmap_to_fb((void*)line_out, (void*)line_in, SCREENWIDTH);
+        line_out_copy = line_out;
+        line_out += width_bytes + x_offset_end;
+        i = fb_scaling;
+        while (--i)
+        {
+            line_out += x_offset;
+            memcpy(line_out, line_out_copy, width_bytes);
+            line_out += width_bytes + x_offset_end;
+        }
+#endif
         line_in += SCREENWIDTH;
     }
 
-	DG_DrawFrame();
+　　DG_DrawFrame();
 }
 
 //

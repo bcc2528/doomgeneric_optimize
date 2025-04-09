@@ -368,7 +368,13 @@ void R_DrawPlanes (void)
 
 		if (dc_yl <= dc_yh)
 		{
+#ifdef LINEARSKY
+		    //angle_t xangle = (angle_t)((0.5 - x / (double)viewwidth) * 1.175 * ANG90);
+		    fixed_t xangle = FixedMul(FixedMul((32768 - FixedDiv(x, viewwidth)), 77005), ANG90);
+		    angle = (viewangle + xangle) >> ANGLETOSKYSHIFT;
+#else
 		    angle = (viewangle + xtoviewangle[x])>>ANGLETOSKYSHIFT;
+#endif
 		    dc_x = x;
 		    dc_source = R_GetColumn(skytexture, angle);
 		    colfunc ();

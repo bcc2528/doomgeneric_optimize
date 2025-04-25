@@ -24,6 +24,20 @@ W wid;
 int ptr_sts = 1;
 int shift_up = 0;
 
+static TC m_finish[] = {MC_STR, TK_E, TK_X, TK_I, TK_T, TNULL | MC_STR, TK_Y, TK_E, TK_S, TNULL};
+static TC m_zoom[]   = {MC_STR, TK_Z, TK_O, TK_O, TK_M, TNULL | MC_STR,
+			TK_1, TK_0, TK_0, TK_PCNT, TNULL | MC_STR,
+			TK_1, TK_5, TK_0, TK_PCNT, TNULL | MC_STR,
+			TK_2, TK_0, TK_0, TK_PCNT, TNULL};
+static MENUITEM mitems[] = {
+	{0L, 0L, 0, 0, m_finish},
+	{0L, 0L, 0, 0, m_zoom},
+	{0L, 0L, 0, 0, NULL},
+	{0L, 0L, 0, 0, NULL},
+};
+static const int n_mitems = sizeof(mitems) / sizeof(MENUITEM);
+static W mid = -1;
+
 #define KEYQUEUE_SIZE 16
 
 static unsigned short s_KeyQueue[KEYQUEUE_SIZE];
@@ -304,6 +318,11 @@ static void addKeyToQueue(int pressed, unsigned short keyCode)
 
 void eventloop()
 {
+	W select_menu;
+	WDSTAT wdstat;
+	int dx, dy;
+	RECT wrect;
+
 	while(1)
 	{
 		wget_evt(&xevt, NOWAIT);
@@ -328,6 +347,11 @@ void eventloop()
 				}
 			}*/
 		case EV_NOMSG:
+			if (xevt.s.wid == winfo[0].wid && xevt.s.cmd == W_WORK && (xevt.s.stat & ES_CMD) == 0)
+			{
+				gset_ptr(PS_SELECT, NULL, -1, -1);
+			}
+
 			if( ((xevt.e.stat & ES_LSHFT)  == ES_LSHFT) || ((xevt.e.stat & ES_RSHFT)  == ES_RSHFT) )
 			{
 				addKeyToQueue(1, KC_SHT_R);
@@ -363,7 +387,7 @@ void eventloop()
 			case W_DELETE:
 			case W_FINISH:
 				wrsp_evt(&xevt, 0); /* ACK */
-				//cont_loop = false;
+				mdel_men(mid);
 				break;
 			}
 		case EV_RSWITCH:
@@ -381,12 +405,12 @@ void eventloop()
 		case EV_BUTDWN:
 			switch (xevt.g.cmd)
 			{
-				case W_FRAM:
-				case W_TITL:
-					wmov_drg(&xevt, NULL);
-					break;
-				case W_WORK:
-					break;
+			case W_FRAM:
+			case W_TITL:
+				wmov_drg(&xevt, NULL);
+				break;
+			case W_WORK:
+				break;
 			}
 			break;
 		case EV_INACT:
@@ -398,6 +422,64 @@ void eventloop()
 			clr_msg(MM_ALL, MM_ALL);
 			break;
 		case EV_MENU:
+			wget_dmn(&(mitems[n_mitems-2].ptr));
+			mset_itm(mid, n_mitems-2, &(mitems[n_mitems-2]));
+			oget_men(0, NULL, &(mitems[n_mitems-1].ptr), NULL, NULL);
+			mset_itm(mid, n_mitems-1, &(mitems[n_mitems-1]));
+
+			select_menu = msel_men(mid, xevt.s.pos);
+
+			if(select_menu == 0)
+			{
+				break;
+			}
+
+			switch(select_menu >> 8)
+			{
+			case 0: // EXIT in right clock menu.
+				switch(select_menu & 0xff)
+				{
+				case 1:
+					ext_prc(1);
+					break;
+				}
+			case 1: // Change Windows size.
+				wget_sts(winfo[0].wid, &wdstat, NULL);
+				dx = wdstat.r.c.right - wdstat.wr.c.right + wdstat.wr.c.left;
+				dy = wdstat.r.c.bottom - wdstat.wr.c.bottom + wdstat.wr.c.top;
+				switch(select_menu & 0xff)
+				{
+				case 1:
+					setrect(wrect, wdstat.r.c.left, wdstat.r.c.top, 640 + dx, 480 + dy);
+					break;
+				case 2:
+					setrect(wrect, wdstat.r.c.left, wdstat.r.c.top, 960 + dx, 720 + dy);
+					break;
+				case 3:
+					setrect(wrect, wdstat.r.c.left, wdstat.r.c.top, 1280 + dx, 960 + dy);
+					break;
+				}
+				wrsz_wnd(winfo[0].wid, &wrect);
+				gid = wget_gid(winfo[0].wid);
+				gget_fra(gid, &wrect);
+				gset_vis(gid, wrect);
+				gget_vis(gid, &visrect);
+				do 
+				{
+					if (wsta_dsp(winfo[0].wid, NULL, NULL) == 0)
+					{
+						break;
+					}
+					wera_wnd(winfo[0].wid, NULL);
+				} while (wend_dsp(winfo[0].wid) > 0);
+				break;
+			case 2:
+				wexe_dmn(select_menu);
+				break;
+			case 3:
+				oexe_apg(0, select_menu);
+				break;
+			}
 			break;
 		case EV_AUTKEY:
 			break;
@@ -438,6 +520,13 @@ void DG_Init()
 
 	// Enable key up event.
 	chg_emk(EM_ALL);
+
+	mid = mcre_men(n_mitems, mitems, NULL);
+	if (mid < 0)
+	{
+		printf("mcre_men: %d\n", mid);
+		ext_prc(1);
+	}
 
 	ScreenBuffer.planes = 1;
 	ScreenBuffer.pixbits = 0x2018;
@@ -516,5 +605,5 @@ int main(int argc, char **argv)
 		doomgeneric_Tick();
 	}
 
-    return 0;
+	return 0;
 }

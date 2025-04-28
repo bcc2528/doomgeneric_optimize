@@ -250,6 +250,15 @@ void DG_Init()
 
 void DG_DrawFrame()
 {
+	MSG msg;
+	memset(&msg, 0, sizeof(msg));
+
+	while (PeekMessageA(&msg, 0, 0, 0, PM_REMOVE) > 0)
+	{
+		TranslateMessage(&msg);
+		DispatchMessageA(&msg);
+	}
+	
 	StretchDIBits(s_Hdc, 0, 0, windowWidth, windowHeight, 0, 0, DOOMGENERIC_RESX, DOOMGENERIC_RESY, DG_ScreenBuffer, &s_Bmi, 0, SRCCOPY);
 }
 
@@ -297,28 +306,10 @@ int main(int argc, char **argv)
 	timeBeginPeriod(1);
 
 	doomgeneric_Create(argc, argv);
-
-	MSG msg;
-	memset(&msg, 0, sizeof(msg));
 	
 	while (1)
 	{
-		if (PeekMessageA(&msg, NULL, 0, 0, PM_NOREMOVE))
-		{
-            		if(GetMessage(&msg, NULL, 0, 0))
-            		{
-                		TranslateMessage(&msg);
-                		DispatchMessageA(&msg);
-            		}
-			else
-			{
-				break;
-			}
-		}
-		else
-		{
-			doomgeneric_Tick();
-		}
+		doomgeneric_Tick();
 	}
 
 	timeEndPeriod(1);

@@ -545,6 +545,8 @@ void DG_DrawFrame()
 	gid = wget_gid(winfo[0].wid);
 	gget_vis(gid, &visrect);
 	grst_bmp(gid, &visrect, &ScreenBuffer, &ScreenBuffer.bounds, NULL, G_STORE);
+
+	eventloop();
 }
 
 void DG_SleepMs(unsigned int ms)
@@ -600,8 +602,6 @@ int main(int argc, char **argv)
 
 	while (1)
 	{
-		eventloop();
-
 		doomgeneric_Tick();
 	}
 
